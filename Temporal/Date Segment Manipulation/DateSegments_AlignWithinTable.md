@@ -4,14 +4,38 @@ Aligns multi-layered, segmented information within a table by a partition so tha
 
 
 ## Syntax
-<code>
-
+<pre><code>
 EXEC dbo.DateSegments_AlignWithinTable 
-    @tableName = 'name',
+
+    @tableName = 'table_name',
+
     @keyFieldList = '[comma delimited list]',
+
     @nonkeyFieldList = '[comma delimited list]',
-    @effectiveDateFieldName = 'column name',
-    @terminationDateFieldName = 'column name'
 
-</code>
+    @effectiveDateFieldName = 'column_name',
 
+    @terminationDateFieldName = 'column_name'
+
+</code></pre>
+
+## Arguments
+
+__@tableName =__ 'table_name'
+The name of the source table. This can be a temporary table or working table or a table in the database. Supports fully qualified table names.
+
+__@keyFieldList =__ '[comma delimited list]'
+
+A list of fields to partition (group) the segments by for alignment. This is required to contain at least 1 column name. 
+
+__@nonkeyFieldList =__ '[comma delimited list']
+
+A list of fields to carry with the division of segments for output. If left empty, only the key fields and date fields will be returned. 
+
+__@effectiveDateFieldName =__ 'column_name'
+
+The name of the column in the source table to use as the effective or start date of the segment. 
+
+__@terminationDateFieldName =__ 'column_name
+
+The name of the column in the source table to use as the termination or end date of the segment.
