@@ -16,7 +16,7 @@ WideWorldImporters: https://github.com/Microsoft/sql-server-samples/releases/tag
 
 ### Date Segment - Align Within Table
 
-[dbo].[DateSegments_AlignWithinTable]
+[[dbo].[DateSegments_AlignWithinTable]](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_AlignWithinTable.md)
 
 Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition.
 
