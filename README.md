@@ -14,9 +14,22 @@ WideWorldImporters: https://github.com/Microsoft/sql-server-samples/releases/tag
 
 ## Temporal - Date Segment Manipulation
 
+### Date Segment - Align Within Table
+
+[dbo].[DateSegments_AlignWithinTable]
+
+Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition.
+
 ### Date Segment - Gap Fill
 
 [dbo].[DateSegments_FillGap]
 
 Creates null (or fake) date segments for a temporal table/data set to ensure that there are no gaps between segments. Is used as a dependency for "DateSegments_Merge" function.
 
+### Date Segment - Merge By Grow
+
+[dbo].[DateSegments_MergeByGrow]
+
+### Date Segment - Merge Tables
+
+[dbo].[DateSegments_MergeTables]
