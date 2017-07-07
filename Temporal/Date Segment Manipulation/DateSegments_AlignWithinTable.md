@@ -169,7 +169,7 @@ SELECT
     ORDER BY EffectiveDate
  ;
 
- EffectiveDate TerminationDate TotalFundedAmount     LargestFundedAmount   GradeLowest          CountOfLoans
+EffectiveDate TerminationDate TotalFundedAmount     LargestFundedAmount   GradeLowest          CountOfLoans
 ------------- --------------- --------------------- --------------------- -------------------- ------------
 2010-01-01    2011-03-31      18500.00              18500.00              C                    1
 2011-04-01    2013-01-31      33500.00              18500.00              C                    2
@@ -182,5 +182,4 @@ SELECT
 2018-02-01    2020-11-30      25000.00              25000.00              C                    1
 
 (9 row(s) affected)
-
 </code></pre>
