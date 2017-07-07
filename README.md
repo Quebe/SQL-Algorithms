@@ -81,8 +81,7 @@ From the AdventureWorks database, bring in the tables: "Person.Person" table and
 
 I alter the EmployeePayHistory to create segments that the rate change is effective for that employee. In addition, I have shifted the start dates of the rates forward 3 years to better align with the loan segments.
 
-<pre><code>
-SELECT BusinessEntityID, PersonType, NameStyle, Title, FirstName, MiddleName, LastName, Suffix INTO Person FROM [AdventureWorks2016CTP3].Person.Person;
+<pre><code>SELECT BusinessEntityID, PersonType, NameStyle, Title, FirstName, MiddleName, LastName, Suffix INTO Person FROM [AdventureWorks2016CTP3].Person.Person;
 
 SELECT * INTO EmployeePayHistory FROM [AdventureWorks2016CTP3].HumanResources.EmployeePayHistory;
 

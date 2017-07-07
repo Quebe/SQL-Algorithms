@@ -85,4 +85,39 @@ This is useful when there is a high amount of turnover in the temporal data.
 
 ## Examples
 
-Examples coming.
+### A. Example - Filling Gaps in Employee Pay History
+
+Not the most useful example as the AdventureWorks employee pay history tables does not have any middle gaps, but this does show a simple example of filling in the information. This example assumes you have prepped the data as recommended in the top-level readme.md.
+
+<pre><code>
+
+	SELECT * FROM EmployeePayHistory WHERE BusinessEntityID = 4 ORDER BY EffectiveDate;
+
+BusinessEntityID RateChangeDate          Rate                  PayFrequency ModifiedDate            EffectiveDate TerminationDate
+---------------- ----------------------- --------------------- ------------ ----------------------- ------------- ---------------
+4                2010-12-05 00:00:00.000 8.62                  2            2007-11-21 00:00:00.000 2010-12-05    2013-05-30
+4                2013-05-31 00:00:00.000 23.72                 2            2010-05-16 00:00:00.000 2013-05-31    2014-12-14
+4                2014-12-15 00:00:00.000 29.8462               2            2011-12-01 00:00:00.000 2014-12-15    9999-12-31
+
+(3 row(s) affected)    
+
+-- WITHOUT RECORD FILL (LEAVE NULL)
+EXEC dbo.[DateSegments_GapFill]
+	@tableName = 'EmployeePayHistory', 
+	@keyFieldList = 'BusinessEntityID',
+	@nonkeyFieldList = 'Rate, PayFrequency',
+	@effectiveDateFieldName = 'EffectiveDate',
+	@terminationDateFieldName = 'TerminationDate',
+	@copyNonkeyFieldValues = 0, -- COPY THE VALUES FROM A REAL RECORD OR SET TO NULL
+	@includeRealIndicator = 1 -- INCLUDE AN INDICATOR IN THE RESULT SET FOR REAL/FAKE RECORD 
+;
+
+BusinessEntityID Rate                  PayFrequency EffectiveDate TerminationDate RealRecord
+---------------- --------------------- ------------ ------------- --------------- ----------
+4                NULL                  NULL         0001-01-01    2010-12-04      0
+4                8.62                  2            2010-12-05    2013-05-30      1
+4                23.72                 2            2013-05-31    2014-12-14      1
+4                29.8462               2            2014-12-15    9999-12-31      1
+
+</code></pre>
+
