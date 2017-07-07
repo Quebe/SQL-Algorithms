@@ -30,12 +30,16 @@ Merges and collapses multiple segments for a partition that match by aggregate f
 Merges segments from 2 tables into one table given a partition.
 
 
-
-
 # Reference Database for Scripts
 The scripts have been developed for stand-alone execution in the dbo schema. 
 
-Data will be sourced from Kaggle data set for [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data) as a source of temporal data. This requires the SQLite ODBC driver if you want to directly import from a Linked Server in SQL Server.
+The test examples use the AdventureWorks or WideWorldImporters sample databases from Microsoft for SQL. 
+ 
+AdventureWorks: https://www.microsoft.com/en-us/download/details.aspx?id=49502 
+
+WideWorldImporters: https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0 
+
+In addition, data will be sourced from Kaggle data set for [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data) as a source of temporal data. This requires the SQLite ODBC driver if you want to directly import from a Linked Server in SQL Server.
 
 In addition, there are some minor changes to data fields to match data types and create segments when used. 
 
@@ -72,3 +76,48 @@ GO
 CREATE CLUSTERED INDEX LoanData_ClusterIdx ON LoanData (member_id, EffectiveDate, TerminationDate);
 GO
 </code></pre>
+
+From the AdventureWorks database, bring in the tables: "Person.Person" table and "HumanResources.EmployeePayHistory" table. We will modify these to use in the examples. In the below code, I am only bringing in non-XML fields across a fully-qualified database name reference.
+
+I alter the EmployeePayHistory to create segments that the rate change is effective for that employee. In addition, I have shifted the start dates of the rates forward 3 years to better align with the loan segments.
+
+<pre><code>
+SELECT BusinessEntityID, PersonType, NameStyle, Title, FirstName, MiddleName, LastName, Suffix INTO Person FROM [AdventureWorks2016CTP3].Person.Person;
+
+SELECT * INTO EmployeePayHistory FROM [AdventureWorks2016CTP3].HumanResources.EmployeePayHistory;
+
+GO
+
+ALTER TABLE EmployeePayHistory ADD EffectiveDate DATE NULL;
+GO
+
+ALTER TABLE EmployeePayHistory ADD TerminationDate DATE NULL;
+GO 
+
+
+UPDATE EmployeePayHistory SET RateChangeDate = DATEADD (YEAR, 3, RateChangeDate);
+
+UPDATE EmployeePayHistory SET EffectiveDate = RateChangeDate;
+
+UPDATE EmployeePayHistory
+
+	SET TerminationDate = SegmentTerminationDate.TerminationDate
+
+	FROM EmployeePayHistory 
+    
+            JOIN (
+		SELECT EmployeePayHistory.BusinessEntityID, EmployeePayHistory.EffectiveDate, ISNULL (DATEADD (DAY, -1, MIN (NextSegment.EffectiveDate)), '12/31/9999') AS TerminationDate
+			FROM EmployeePayHistory
+				LEFT JOIN EmployeePayHistory AS NextSegment
+				ON EmployeePayHistory.BusinessEntityID = NextSegment.BusinessEntityID
+				AND EmployeePayHistory.EffectiveDate < NextSegment.EffectiveDate
+			GROUP BY EmployeePayHistory.BusinessEntityID, EmployeePayHistory.EffectiveDate
+	    ) AS SegmentTerminationDate
+
+	ON EmployeePayHistory.BusinessEntityID = SegmentTerminationDate.BusinessEntityID 
+
+	    AND EmployeePayHistory.EffectiveDate = SegmentTerminationDate.EffectiveDate
+</code></pre>
+
+
+

@@ -222,3 +222,7 @@ member_id            EffectiveDate TerminationDate IdList
 319                  2018-02-01    2020-11-30      65413538
 </code></pre>
 
+
+## References
+
+[Reddit Discussion of the Stored Procedure.](https://www.reddit.com/r/SQL/comments/6ltvm4/ms_sql_asking_for_critique_of_stored_procedure/)
