@@ -80,6 +80,8 @@ The resultant set of segments can be quickly flatten based on a set of business 
 "C":                      |-------------|-----|
 </code></pre>
 
+In addition, since the segments line up, you could aggregate a column or set of values across a time period know that the all segments would share the same effective and termination date for that set of overlapping segments. 
+
 The number of segments can be reduced using the "DateSegment_MergeByGrow" stored procedure to produce the following result:
 
 <pre><code>
@@ -91,5 +93,94 @@ The number of segments can be reduced using the "DateSegment_MergeByGrow" stored
 
 ## Examples
 
-### A. Example
+### A. Example - Flattening Loan Data
 
+The below example uses the loan data from Kaggle data set from [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data). You will need to import the table into SQL Server using the [ODBC SQLite database driver](http://www.ch-werner.de/sqliteodbc/).
+
+See the top-level readme.md on how to prep the table for analysis. 
+
+<pre><code>
+CREATE TABLE LoanDataAligned (member_id BIGINT, id VARCHAR (0020), grade VARCHAR (0020), funded_amnt MONEY, loan_status VARCHAR (0060), EffectiveDate DATE, TerminationDate DATE);
+
+INSERT INTO LoanDataAligned
+EXEC dbo.DateSegments_AlignWithinTable
+	@tableName = 'LoanData', 
+	@keyFieldList = 'member_id',
+	@nonkeyFieldList = 'id, grade, funded_amnt, loan_status', 
+	@effectiveDateFieldName = 'EffectiveDate',
+	@terminationDateFieldName = 'TerminationDate'
+;
+</code></pre>
+
+What this does is for each member (the partition by @keyFieldList), we will break apart the loan segments (each member can have one or loans during a time period) to allow use to easily aggregate later. 
+
+__Original Set of Segments for Member (319) Sorted by "id"__
+<pre><code>
+id                   EffectiveDate TerminationDate grade                funded_amnt            loan_status
+-------------------- ------------- --------------- -------------------- ---------------------- ------------------------------------------------------------
+474548               2010-01-01    2013-01-31      C                    18500                  Does not meet the credit policy. Status:Charged Off
+707917               2011-04-01    2016-04-30      D                    15000                  Charged Off
+7338296              2013-09-01    2016-09-30      C                    9750                   Fully Paid
+37227561             2015-01-01    2018-01-31      A                    12000                  Current
+65413538             2015-11-01    2020-11-30      C                    25000                  Current
+
+(5 row(s) affected)
+</code></pre>
+
+__Segments Aligned for Member (319) Sorted by "id"__
+<pre><code>
+id                   EffectiveDate TerminationDate grade                funded_amnt           loan_status
+-------------------- ------------- --------------- -------------------- --------------------- ------------------------------------------------------------
+474548               2010-01-01    2011-03-31      C                    18500.00              Does not meet the credit policy. Status:Charged Off
+474548               2011-04-01    2013-01-31      C                    18500.00              Does not meet the credit policy. Status:Charged Off
+707917               2013-09-01    2014-12-31      D                    15000.00              Charged Off
+707917               2015-01-01    2015-10-31      D                    15000.00              Charged Off
+707917               2015-11-01    2016-04-30      D                    15000.00              Charged Off
+707917               2011-04-01    2013-01-31      D                    15000.00              Charged Off
+707917               2013-02-01    2013-08-31      D                    15000.00              Charged Off
+7338296              2013-09-01    2014-12-31      C                    9750.00               Fully Paid
+7338296              2015-11-01    2016-04-30      C                    9750.00               Fully Paid
+7338296              2015-01-01    2015-10-31      C                    9750.00               Fully Paid
+7338296              2016-05-01    2016-09-30      C                    9750.00               Fully Paid
+37227561             2016-05-01    2016-09-30      A                    12000.00              Current
+37227561             2015-11-01    2016-04-30      A                    12000.00              Current
+37227561             2016-10-01    2018-01-31      A                    12000.00              Current
+37227561             2015-01-01    2015-10-31      A                    12000.00              Current
+65413538             2016-05-01    2016-09-30      C                    25000.00              Current
+65413538             2018-02-01    2020-11-30      C                    25000.00              Current
+65413538             2015-11-01    2016-04-30      C                    25000.00              Current
+65413538             2016-10-01    2018-01-31      C                    25000.00              Current
+
+(19 row(s) affected)
+</code></pre>
+
+Now, we can aggregate across the segments as they line up and feel confident in the results. This allows us to see the trends over time of multiple loans in aggregation. This is one example of what you could do. You could use the "grade" or another attribute to pick out the "most important" information for that time period and use that as the primary segment - not just aggregate by window the result by ranking. 
+
+<pre><code>
+SELECT 
+        EffectiveDate, TerminationDate,
+        SUM (funded_amnt) AS TotalFundedAmount, 
+        MAX (funded_amnt) AS LargestFundedAmount,
+        MIN (grade) AS GradeLowest,
+        COUNT (DISTINCT (id)) AS CountOfLoans
+    FROM LoanDataAligned 
+    WHERE member_id = 319 
+    GROUP BY EffectiveDate, TerminationDate
+    ORDER BY EffectiveDate
+ ;
+
+ EffectiveDate TerminationDate TotalFundedAmount     LargestFundedAmount   GradeLowest          CountOfLoans
+------------- --------------- --------------------- --------------------- -------------------- ------------
+2010-01-01    2011-03-31      18500.00              18500.00              C                    1
+2011-04-01    2013-01-31      33500.00              18500.00              C                    2
+2013-02-01    2013-08-31      15000.00              15000.00              D                    1
+2013-09-01    2014-12-31      24750.00              15000.00              C                    2
+2015-01-01    2015-10-31      36750.00              15000.00              A                    3
+2015-11-01    2016-04-30      61750.00              25000.00              A                    4
+2016-05-01    2016-09-30      46750.00              25000.00              A                    3
+2016-10-01    2018-01-31      37000.00              25000.00              A                    2
+2018-02-01    2020-11-30      25000.00              25000.00              C                    1
+
+(9 row(s) affected)
+
+</code></pre>
