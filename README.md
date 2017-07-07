@@ -13,19 +13,19 @@ Aligns multi-layered, segmented information within a table by a partition so tha
 
 ### Date Segment - Gap Fill
 
-[dbo].[DateSegments_FillGap]
+[dbo].[DateSegments_FillGap](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_GapFill.md)
 
 Creates null (or fake) date segments for a temporal table/data set to ensure that there are no gaps between segments. Is used as a dependency for "DateSegments_Merge" function.
 
 ### Date Segment - Merge By Grow
 
-[dbo].[DateSegments_MergeByGrow]
+[dbo].[DateSegments_MergeByGrow](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_MergeByGrow.md)
 
 Merges and collapses multiple segments for a partition that match by aggregate fields using a grow/overlap method and returning distinct segments. Works on a single table. 
 
 ### Date Segment - Merge Tables
 
-[dbo].[DateSegments_MergeTables]
+[dbo].[DateSegments_MergeTables](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_MergeTables.md)
 
 Merges segments from 2 tables into one table given a partition.
 
