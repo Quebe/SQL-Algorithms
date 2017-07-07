@@ -50,7 +50,7 @@ __@copyNonkeyFieldValues =__ [0|1] (bit)
 
 This determines if we copy the values from the non-key fields that we are carrying from the real segment forward into the new generated gap segment.
 
-__@includeRealIndicator = __ [0|1] (bit)
+__@includeRealIndicator =__ [0|1] (bit)
 
 This determines if we include an additional column on the return result set that indicates if the record was an original record or generated record. The column name is "RealRecord" and is a BIT.
 
