@@ -48,19 +48,20 @@ In addition, there are some minor changes to data fields to match data types and
 Imported Data in as table "LoanData". Then, execute the following statements in T-SQL to prep the table. Since the data set has 1 record per member, we want to change it where a single member can have multiple loans (potentially overlapping or gapped) loans. We will simply take the member_id and divide by 10, convert back to an integer to group loans "randomly." 
 
 <pre><code>
-UPDATE LoanData SET member_id = CAST (member_id / 10 AS BIGINT);
+DELETE FROM LoanData WHERE member_id IS NULL;
+UPDATE LoanData SET member_id = RIGHT (CAST (CONVERT (BIGINT, member_id) AS VARCHAR (0020)), LEN (CAST (CONVERT (BIGINT, member_id) AS VARCHAR (0020))) -1);
+GO
+
 
 ALTER TABLE LoanData ADD EffectiveDate DATE NULL;
 GO
 
 ALTER TABLE LoanData ADD TerminationDate DATE NULL;
-GO
+GO 
 
 UPDATE LoanData SET EffectiveDate = PARSE (CAST (issue_d AS CHAR (0020)) AS date);
-
 UPDATE LoanData SET TerminationDate = DATEADD (DAY, -1, DATEADD (MONTH, ISNULL (CAST (SUBSTRING (term, 2, 2) AS INT), 0) + 1, EffectiveDate));
-
-DELETE FROM LoanData WHERE member_id IS NULL;
+GO
 
 /* CHANGE DATA TYPES FROM NTEXT TO SOMETHING WORKABLE */
 
@@ -68,11 +69,11 @@ ALTER TABLE LoanData ALTER COLUMN [id] VARCHAR (0020);
 GO
 
 ALTER TABLE LoanData ALTER COLUMN [grade] VARCHAR (0020);
-GO
+GO 
 
 ALTER TABLE LoanData ALTER COLUMN [loan_status] VARCHAR (0060);
 GO
 
 CREATE CLUSTERED INDEX LoanData_ClusterIdx ON LoanData (member_id, EffectiveDate, TerminationDate);
-
+GO
 </code></pre>
