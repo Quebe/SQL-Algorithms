@@ -21,7 +21,7 @@ Creates null (or fake) date segments for a temporal table/data set to ensure tha
 
 [dbo].[DateSegments_MergeByGrow]
 
-Merges and collapses multiple segments for a partition that match by aggregate fields using a grow/overlap method and returning distinct segments.
+Merges and collapses multiple segments for a partition that match by aggregate fields using a grow/overlap method and returning distinct segments. Works on a single table. 
 
 ### Date Segment - Merge Tables
 
