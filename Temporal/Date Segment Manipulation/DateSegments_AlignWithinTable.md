@@ -97,7 +97,7 @@ The number of segments can be reduced using the "DateSegment_MergeByGrow" stored
 
 The below example uses the loan data from Kaggle data set from [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data). You will need to import the table into SQL Server using the [ODBC SQLite database driver](http://www.ch-werner.de/sqliteodbc/).
 
-See the top-level readme.md on how to prep the table for analysis. 
+See the top-level [readme.md](https://github.com/Quebe/SQL-Algorithms/blob/master/README.md) on how to prep the table for analysis. 
 
 <pre><code>
 CREATE TABLE LoanDataAligned (member_id BIGINT, id VARCHAR (0020), grade VARCHAR (0020), funded_amnt MONEY, loan_status VARCHAR (0060), EffectiveDate DATE, TerminationDate DATE);
