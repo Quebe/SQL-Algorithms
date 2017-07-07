@@ -33,25 +33,20 @@ Merges segments from 2 tables into one table given a partition.
 
 
 # Reference Database for Scripts
-The scripts have been developed for stand-alone execution in the dbo schema. The test examples use the AdventureWorks or WideWorldImporters sample databases from Microsoft for SQL.
+The scripts have been developed for stand-alone execution in the dbo schema. 
 
-AdventureWorks:
-https://www.microsoft.com/en-us/download/details.aspx?id=49502
-
-
-WideWorldImporters: https://github.com/Microsoft/sql-server-samples/releases/tag/wide-world-importers-v1.0
-
-Additional data will be sourced from Kaggle data set for [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data) as a source of temporal data. This requires the SQLite ODBC driver if you want to directly import from a Linked Server in SQL Server.
+Data will be sourced from Kaggle data set for [Lending Club Loan Data](https://www.kaggle.com/wendykan/lending-club-loan-data) as a source of temporal data. This requires the SQLite ODBC driver if you want to directly import from a Linked Server in SQL Server.
 
 In addition, there are some minor changes to data fields to match data types and create segments when used. 
 
-Imported Data in as table "LoanData". Then, execute the following statements in T-SQL to prep the table. Since the data set has 1 record per member, we want to change it where a single member can have multiple loans (potentially overlapping or gapped) loans. We will simply take the member_id and divide by 10, convert back to an integer to group loans "randomly." 
+Import data in as the table "LoanData". Then, execute the following statements in T-SQL to prep the table. Since the data set has 1 record per member, we want to change it where a single member can have multiple loans (potentially overlapping or gapped) loans. We will simply take the member_id and remove the first digit, convert back to an integer to group loans "randomly." 
+
+The reason for removing the first digit is because the "member_id" is incremental based closely on loan date, and we want loans have a good range of loan periods.
 
 <pre><code>
 DELETE FROM LoanData WHERE member_id IS NULL;
 UPDATE LoanData SET member_id = RIGHT (CAST (CONVERT (BIGINT, member_id) AS VARCHAR (0020)), LEN (CAST (CONVERT (BIGINT, member_id) AS VARCHAR (0020))) -1);
 GO
-
 
 ALTER TABLE LoanData ADD EffectiveDate DATE NULL;
 GO

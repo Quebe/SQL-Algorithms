@@ -156,7 +156,7 @@ id                   EffectiveDate TerminationDate grade                funded_a
 
 Now, we can aggregate across the segments as they line up and feel confident in the results. This allows us to see the trends over time of multiple loans in aggregation. This is one example of what you could do. You could use the "grade" or another attribute to pick out the "most important" information for that time period and use that as the primary segment - not just aggregate by window the result by ranking. 
 
-__Warning:__ Each row no longer represents a specific loan. Meaning the individual start/stop, term, of that loan is lost because we didn't carry those fields forward. We could simply carry forward an overarching set of loan dates in the non-key field list. The Effective and Termination dates returned are the time period for each the information is valid for on that row. The purpose is to look at aggregation and trends over time series and not specifically at 1 individual instance.
+__Warning:__ Each row no longer represents a specific loan. Meaning the individual start/stop, term, of that loan is lost because we didn't carry those fields forward (e.g. "issue_d" and "term"). We could simply carry forward an overarching set of loan dates in the non-key field list. The Effective and Termination dates returned are the time period for each the information is valid for on that row. The purpose is to look at aggregation and trends over time series and not specifically at 1 individual instance.
 
 <pre><code>
 SELECT 
