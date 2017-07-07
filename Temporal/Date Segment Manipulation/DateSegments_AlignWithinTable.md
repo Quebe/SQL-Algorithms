@@ -185,3 +185,40 @@ EffectiveDate TerminationDate TotalFundedAmount     LargestFundedAmount   GradeL
 
 (9 row(s) affected)
 </code></pre>
+
+Finally, we can create a ragged column of ids aggregated by time segment. This uses an subquery to pivot the rows to a ragged column by using the "FOR XML PATH" output. 
+
+This can answer questions like this one from StackOverflow: [Date Range Intersection Splitting in SQL](https://stackoverflow.com/questions/1397877/date-range-intersection-splitting-in-sql/1414494)
+
+<pre><code>
+SELECT 
+	member_id, EffectiveDate, TerminationDate,
+
+	SUBSTRING ((SELECT ',' + [id] FROM LoanDataAligned AS innerTable 
+		WHERE 
+			innerTable.member_id = LoanDataAligned.member_id 
+			AND (innerTable.EffectiveDate = LoanDataAligned.EffectiveDate) 
+			AND (innerTable.TerminationDate = LoanDataAligned.TerminationDate)
+		ORDER BY id
+		FOR XML PATH ('')), 2, 999999999999999) AS IdList
+
+ FROM LoanDataAligned 
+ WHERE member_id = 319 
+ GROUP BY member_id, EffectiveDate, TerminationDate
+ ORDER BY EffectiveDate
+</code></pre>
+
+<pre><code>
+member_id            EffectiveDate TerminationDate IdList
+-------------------- ------------- --------------- -----------------------------------
+319                  2010-01-01    2011-03-31      474548
+319                  2011-04-01    2013-01-31      474548,707917
+319                  2013-02-01    2013-08-31      707917
+319                  2013-09-01    2014-12-31      707917,7338296
+319                  2015-01-01    2015-10-31      37227561,707917,7338296
+319                  2015-11-01    2016-04-30      37227561,65413538,707917,7338296
+319                  2016-05-01    2016-09-30      37227561,65413538,7338296
+319                  2016-10-01    2018-01-31      37227561,65413538
+319                  2018-02-01    2020-11-30      65413538
+</code></pre>
+
