@@ -1,15 +1,15 @@
 # SQL-Algorithms
 Collection of algorithms written in Transact-SQL that I have developed over the years.
 
-## Temporal - Date Segment Manipulation
+## Temporal - Date Range and Segment Manipulation
 
 The below functions are focused on transforming segmented, time sensitive information stored in a normalized database structure or for transactional processing in an aggregated method for analytics and reporting to increase ease of access, reduce complexity of joins, and provide better time series analysis. 
 
-### Date Segment - Align Within Table
+### Date Segment - Alignment Within Table
 
 [[dbo].[DateSegments_AlignWithinTable]](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_AlignWithinTable.md)
 
-Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition.
+Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition. Date range alignment of segmnets of information.
 
 ### Date Segment - Gap Fill
 
