@@ -9,7 +9,7 @@ The below functions are focused on transforming segmented, time sensitive inform
 
 [[dbo].[DateSegments_AlignWithinTable]](https://github.com/Quebe/SQL-Algorithms/blob/master/Temporal/Date%20Segment%20Manipulation/DateSegments_AlignWithinTable.md)
 
-Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition. Date range alignment of segmnets of information.
+Aligns multi-layered, segmented information within a table by a partition so that each segment will break with evenly. This enables easier aggregation when needing to prioritize information stored across multiple segments within a single partition. Date range alignment of segments of information by splitting rows by each other.
 
 ### Date Segment - Gap Fill
 
